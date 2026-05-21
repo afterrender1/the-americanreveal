@@ -1,26 +1,292 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-cream: #EBE6D9;
+  --color-ink: #0A0A0A;
+  --color-crimson: #B91C1C;
+  --color-crimson-dark: #991B1B;
+  --color-steel: #4B4540;
+  --color-border: #D5CFC3;
+  --color-card: #FFFFFF;
+  --color-header: #0A0A0A;
+  --color-muted: #7A746D;
+
+  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #EBE6D9;
+  color: #0A0A0A;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Featured dark card hover ──────────────── */
+.featured-hover {
+  outline: 2px solid transparent;
+  outline-offset: 0;
+  transition: outline-color 0.22s ease;
+}
+.featured-hover:hover {
+  outline-color: var(--card-accent, #B91C1C);
+}
+
+/* ── Compact card hover ─────────────────────── */
+.compact-hover {
+  outline: 2px solid transparent;
+  outline-offset: -1px;
+  transition: outline-color 0.18s ease, background-color 0.18s ease;
+}
+.compact-hover:hover {
+  background-color: rgba(255,255,255,0.65);
+  outline-color: var(--card-accent, #B91C1C);
+}
+
+/* ── Premium card shadow + hover ring ──────── */
+.card-shadow {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 2px 16px rgba(0,0,0,0.04);
+  outline: 2px solid transparent;
+  outline-offset: 0px;
+  transition: box-shadow 0.22s ease, transform 0.22s ease, outline-color 0.22s ease;
+}
+.card-shadow:hover {
+  box-shadow: 0 8px 28px rgba(0,0,0,0.13), 0 2px 6px rgba(0,0,0,0.07);
+  transform: translateY(-3px);
+  outline-color: var(--card-accent, #B91C1C);
+}
+
+/* ── Article reading typography ────────────── */
+.article-content {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.9;
+  color: #1C1714;
+}
+
+/* Drop cap on first paragraph */
+.article-content > p:first-of-type::first-letter {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 0.82;
+  float: left;
+  margin-right: 0.1em;
+  margin-top: 0.06em;
+  color: #0A0A0A;
+}
+
+.article-content h2 {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  color: #0A0A0A;
+  letter-spacing: -0.015em;
+}
+
+.article-content h3 {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 2.25rem;
+  margin-bottom: 0.75rem;
+  color: #0A0A0A;
+}
+
+.article-content h4 {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  color: #4B4540;
+}
+
+.article-content p { margin-bottom: 1.65rem; }
+
+.article-content ul,
+.article-content ol {
+  margin: 1.25rem 0 1.65rem;
+  padding-left: 1.75rem;
+}
+.article-content ul { list-style-type: disc; }
+.article-content ol { list-style-type: decimal; }
+.article-content li { margin-bottom: 0.45rem; line-height: 1.8; }
+
+.article-content blockquote {
+  border-left: 3px solid #B91C1C;
+  margin: 2.5rem 0;
+  padding: 0.875rem 1.75rem;
+  font-style: italic;
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: #4B4540;
+  background: rgba(185,28,28,0.025);
+}
+
+.article-content strong { font-weight: 700; color: #0A0A0A; }
+.article-content em { font-style: italic; }
+
+.article-content a {
+  color: #B91C1C;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.article-content a:hover { color: #991B1B; }
+
+.article-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 2.5rem auto;
+  display: block;
+}
+
+.article-content code {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.875em;
+  background: #DDD9CF;
+  padding: 0.1em 0.4em;
+}
+
+.article-content pre {
+  background: #0A0A0A;
+  color: #e5e7eb;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  margin: 1.75rem 0;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.article-content mark {
+  padding: 0.1em 0.2em;
+}
+
+.article-content hr {
+  border: none;
+  border-top: 1px solid #D5CFC3;
+  margin: 3rem 0;
+}
+
+.article-content figure {
+  margin: 2.5rem 0;
+}
+
+.article-content figure img {
+  width: 100%;
+  height: auto;
+  margin: 0;
+  display: block;
+}
+
+.article-content figcaption {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  color: #7A746D;
+  margin-top: 0.625rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  padding: 0 0.25rem;
+  border-left: 2px solid #D5CFC3;
+  padding-left: 0.75rem;
+}
+
+.article-content .sources {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #D5CFC3;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: #7A746D;
+  line-height: 1.7;
+}
+
+/* ── TipTap rich editor ──────────────────── */
+.rich-editor .ProseMirror {
+  outline: none;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #1C1714;
+  min-height: 520px;
+}
+
+.rich-editor .ProseMirror p { margin-bottom: 1.25rem; }
+
+.rich-editor .ProseMirror h2 {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: #0A0A0A;
+}
+
+.rich-editor .ProseMirror h3 {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.rich-editor .ProseMirror h4 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: 1.25rem;
+  margin-bottom: 0.4rem;
+  color: #4B4540;
+}
+
+.rich-editor .ProseMirror ul,
+.rich-editor .ProseMirror ol { padding-left: 1.5rem; margin: 1rem 0; }
+.rich-editor .ProseMirror ul { list-style-type: disc; }
+.rich-editor .ProseMirror ol { list-style-type: decimal; }
+.rich-editor .ProseMirror li { margin-bottom: 0.35rem; }
+
+.rich-editor .ProseMirror blockquote {
+  border-left: 3px solid #B91C1C;
+  margin: 1.5rem 0;
+  padding: 0.6rem 1.25rem;
+  font-style: italic;
+  color: #4B4540;
+  background: rgba(185,28,28,0.025);
+}
+
+.rich-editor .ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+  cursor: default;
+}
+
+.rich-editor .ProseMirror a { color: #B91C1C; text-decoration: underline; }
+.rich-editor .ProseMirror mark { padding: 0.1em 0.2em; }
+.rich-editor .ProseMirror code {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.875em;
+  background: #EBE6D9;
+  padding: 0.1em 0.35em;
+}
+
+.rich-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #7A746D;
+  pointer-events: none;
+  height: 0;
+  font-style: italic;
+  font-family: Georgia, serif;
 }
