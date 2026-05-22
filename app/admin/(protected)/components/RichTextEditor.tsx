@@ -387,9 +387,12 @@ export default function RichTextEditor({
     },
   });
 
+  const [uploadError, setUploadError] = useState("");
+
   const uploadImage = useCallback(
     async (file: File) => {
       setImageUploading(true);
+      setUploadError("");
       try {
         const fd = new FormData();
         fd.append("file", file);
@@ -397,9 +400,11 @@ export default function RichTextEditor({
         const data = await res.json();
         if (data.url && editor) {
           editor.chain().focus().setImage({ src: data.url }).run();
+        } else {
+          setUploadError(data.error ?? "Upload failed — please use the image URL button instead.");
         }
       } catch {
-        // silently fail — image stays as-is
+        setUploadError("Upload failed — please use the image URL button instead.");
       } finally {
         setImageUploading(false);
       }
@@ -511,12 +516,15 @@ export default function RichTextEditor({
 
         <Sep />
 
-        {/* Image — URL with size picker */}
-        <ImageDialog
-          onInsert={(url, cls) => {
-            editor.chain().focus().setImage({ src: url, class: cls } as never).run();
-          }}
-        />
+        {/* Image — URL with size picker (works on live site) */}
+        <div className="flex items-center gap-0.5 bg-crimson/10 border border-crimson/20 px-1 rounded-sm">
+          <span className="text-[0.55rem] font-bold uppercase tracking-wider text-crimson">IMG</span>
+          <ImageDialog
+            onInsert={(url, cls) => {
+              editor.chain().focus().setImage({ src: url, class: cls } as never).run();
+            }}
+          />
+        </div>
 
         {/* Image — file upload (dev only) */}
         <label className="cursor-pointer">
@@ -586,7 +594,10 @@ export default function RichTextEditor({
         </Btn>
 
         {imageUploading && (
-          <span className="ml-2 text-xs text-muted animate-pulse">Uploading image…</span>
+          <span className="ml-2 text-xs text-muted animate-pulse">Uploading…</span>
+        )}
+        {uploadError && (
+          <span className="ml-2 text-xs text-crimson font-semibold">{uploadError}</span>
         )}
       </div>
 
