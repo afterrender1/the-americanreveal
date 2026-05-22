@@ -317,7 +317,9 @@ export default function RichTextEditor({
     [editor]
   );
 
-  if (!editor) return null;
+  if (!editor) {
+    return <input type="hidden" name={name} value={html} />;
+  }
 
   return (
     <div className="border border-border bg-white">

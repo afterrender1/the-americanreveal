@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createArticle, updateArticle, deleteArticle } from "@/lib/articles";
+import { sendNewsletterForArticle } from "@/lib/mailer";
 import {
   validateCredentials,
   getValidSessionToken,
@@ -66,21 +67,31 @@ export async function createArticleAction(
 
   const publishedAt = scheduledAt ?? new Date().toISOString();
 
-  await createArticle({
-    title,
-    slug,
-    excerpt,
-    content,
-    category,
-    author,
-    publishedAt,
-    published,
-    featured,
-    coverImage,
-    pdfUrl,
-    accentColor,
-    scheduledAt,
-  });
+  let article;
+  try {
+    article = await createArticle({
+      title,
+      slug,
+      excerpt,
+      content,
+      category,
+      author,
+      publishedAt,
+      published,
+      featured,
+      coverImage,
+      pdfUrl,
+      accentColor,
+      scheduledAt,
+    });
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to save article. Please try again." };
+  }
+
+  // Send newsletter to subscribers if publishing immediately (not scheduled)
+  if (published && !scheduledAt) {
+    sendNewsletterForArticle(article).catch(() => {});
+  }
 
   revalidatePath("/");
   revalidatePath("/admin/dashboard");
@@ -112,20 +123,24 @@ export async function updateArticleAction(
     return { error: "All fields except Author are required." };
   }
 
-  await updateArticle(id, {
-    title,
-    slug,
-    excerpt,
-    content,
-    category,
-    author,
-    published,
-    featured,
-    coverImage,
-    pdfUrl,
-    accentColor,
-    scheduledAt,
-  });
+  try {
+    await updateArticle(id, {
+      title,
+      slug,
+      excerpt,
+      content,
+      category,
+      author,
+      published,
+      featured,
+      coverImage,
+      pdfUrl,
+      accentColor,
+      scheduledAt,
+    });
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to save article. Please try again." };
+  }
 
   revalidatePath("/");
   revalidatePath(`/article/${slug}`);

@@ -41,6 +41,10 @@ export default async function EditArticlePage({ params }: PageProps) {
             author: article.author,
             published: article.published,
             featured: article.featured,
+            coverImage: article.coverImage,
+            pdfUrl: article.pdfUrl,
+            accentColor: article.accentColor,
+            scheduledAt: article.scheduledAt,
           }}
           submitLabel="Save Changes"
         />
