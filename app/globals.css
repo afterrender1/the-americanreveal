@@ -158,6 +158,63 @@ body {
   height: auto;
   margin: 2.5rem auto;
   display: block;
+  border-radius: 4px;
+}
+
+/* Image size classes */
+.article-content img.img-full {
+  width: 100%;
+}
+.article-content img.img-large {
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.article-content img.img-medium {
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.article-content img.img-small {
+  width: 30%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.article-content img.img-left {
+  float: left;
+  width: 40%;
+  margin: 0.5rem 1.75rem 1rem 0;
+}
+.article-content img.img-right {
+  float: right;
+  width: 40%;
+  margin: 0.5rem 0 1rem 1.75rem;
+}
+.article-content::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* ── Resizable image handles in editor ──────── */
+.rich-editor .image-resizer {
+  display: inline-flex;
+  position: relative;
+}
+.rich-editor .image-resizer img {
+  display: block;
+}
+.rich-editor .image-resizer .resize-trigger {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 14px;
+  height: 14px;
+  background: #C41E1E;
+  border: 2px solid white;
+  border-radius: 2px;
+  cursor: se-resize;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
 .article-content code {

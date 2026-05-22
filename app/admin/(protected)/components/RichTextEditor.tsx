@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Color from "@tiptap/extension-color";
 import { TextStyle } from "@tiptap/extension-text-style";
-import ImageExtension from "@tiptap/extension-image";
+import { ImageResize as ImageExtension } from "tiptap-extension-resize-image";
 import LinkExtension from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
@@ -71,6 +71,93 @@ function Btn({
 
 function Sep() {
   return <div className="w-px h-5 bg-border mx-0.5 shrink-0" />;
+}
+
+/* ─── Image dialog ───────────────────────────────────────────── */
+
+const IMAGE_SIZES = [
+  { label: "Full", value: "img-full" },
+  { label: "Large", value: "img-large" },
+  { label: "Medium", value: "img-medium" },
+  { label: "Small", value: "img-small" },
+  { label: "← Left", value: "img-left" },
+  { label: "Right →", value: "img-right" },
+];
+
+function ImageDialog({ onInsert }: { onInsert: (url: string, cls: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [url, setUrl] = useState("");
+  const [size, setSize] = useState("img-full");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function close(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, []);
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (url.trim()) {
+      onInsert(url.trim(), size);
+      setUrl("");
+      setOpen(false);
+    }
+  }
+
+  return (
+    <div className="relative" ref={ref}>
+      <Btn onClick={() => { setOpen((v) => !v); setTimeout(() => inputRef.current?.focus(), 50); }} title="Insert Image URL">
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </Btn>
+      {open && (
+        <form
+          onSubmit={submit}
+          className="absolute top-full left-0 mt-1 z-50 bg-white border border-border shadow-xl p-3 space-y-2.5"
+          style={{ minWidth: 300 }}
+        >
+          <p className="text-[0.6rem] font-bold uppercase tracking-widest text-muted">Insert Image</p>
+          <input
+            ref={inputRef}
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="Paste image URL…"
+            className="w-full border border-border px-2 py-1.5 text-xs focus:outline-none focus:border-steel/50"
+          />
+          <div>
+            <p className="text-[0.6rem] text-muted mb-1.5 uppercase tracking-widest">Size</p>
+            <div className="flex flex-wrap gap-1">
+              {IMAGE_SIZES.map((s) => (
+                <button
+                  key={s.value}
+                  type="button"
+                  onClick={() => setSize(s.value)}
+                  className={`text-[0.6rem] font-semibold px-2 py-1 border transition-colors ${
+                    size === s.value
+                      ? "bg-ink text-white border-ink"
+                      : "border-border text-steel hover:bg-[#F5F2EC]"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex gap-1.5 pt-1">
+            <button type="submit" className="flex-1 bg-ink text-white text-xs px-3 py-1.5 hover:bg-steel transition-colors">
+              Insert
+            </button>
+            <button type="button" onClick={() => setOpen(false)} className="text-xs text-muted px-2 border border-border hover:bg-[#F5F2EC]">✕</button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
 }
 
 /* ─── Link dialog ────────────────────────────────────────────── */
@@ -261,7 +348,10 @@ export default function RichTextEditor({
       TextStyle,
       Color,
       Highlight.configure({ multicolor: true }),
-      ImageExtension.configure({ allowBase64: true }),
+      ImageExtension.configure({
+        allowBase64: true,
+        HTMLAttributes: { class: null },
+      }),
       LinkExtension.configure({ openOnClick: false, autolink: true }),
       Placeholder.configure({ placeholder }),
     ],
@@ -421,16 +511,23 @@ export default function RichTextEditor({
 
         <Sep />
 
-        {/* Image upload */}
+        {/* Image — URL with size picker */}
+        <ImageDialog
+          onInsert={(url, cls) => {
+            editor.chain().focus().setImage({ src: url, class: cls } as never).run();
+          }}
+        />
+
+        {/* Image — file upload (dev only) */}
         <label className="cursor-pointer">
           <div
             className={`h-7 px-1.5 flex items-center gap-1 text-xs font-medium border border-transparent text-steel hover:border-border hover:bg-white transition-colors select-none ${imageUploading ? "opacity-50 pointer-events-none" : ""}`}
-            title="Upload image"
+            title="Upload image file"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span>{imageUploading ? "Uploading…" : "Image"}</span>
+            <span>{imageUploading ? "…" : "↑"}</span>
           </div>
           <input
             type="file"

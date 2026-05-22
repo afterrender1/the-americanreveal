@@ -206,13 +206,24 @@ export default function ArticleForm({ action, initial, submitLabel }: ArticleFor
           {/* Cover Image */}
           <div className={`${sidebarCardCls} space-y-2`}>
             <label className={labelCls}>Cover Image</label>
-            {coverImage ? (
-              <div className="relative">
+
+            {/* URL input — primary method */}
+            <input
+              type="text"
+              value={coverImage}
+              onChange={(e) => setCoverImage(e.target.value)}
+              className={`${inputCls} text-xs`}
+              placeholder="Paste image URL here…"
+            />
+
+            {/* Preview — fixed 16:9 box, image always cropped to fill */}
+            {coverImage && (
+              <div className="relative w-full h-24 overflow-hidden border border-border bg-border/20">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={coverImage}
                   alt="Cover"
-                  className="w-full h-36 object-cover border border-border"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
                 <button
                   type="button"
@@ -222,15 +233,15 @@ export default function ArticleForm({ action, initial, submitLabel }: ArticleFor
                   Remove
                 </button>
               </div>
-            ) : (
-              <label className="block cursor-pointer border-2 border-dashed border-border hover:border-steel/40 transition-colors p-5 text-center">
+            )}
+
+            {/* File upload — secondary, shows error clearly */}
+            {!coverImage && (
+              <label className="block cursor-pointer border border-dashed border-border hover:border-steel/40 transition-colors p-3 text-center">
                 {imageUploading ? (
                   <span className="text-xs text-muted">Uploading…</span>
                 ) : (
-                  <>
-                    <span className="text-xs text-muted block mb-0.5">Click to upload</span>
-                    <span className="text-[0.6rem] text-muted/50">JPG, PNG, WebP, GIF</span>
-                  </>
+                  <span className="text-[0.6rem] text-muted/60">or click to upload file</span>
                 )}
                 <input
                   type="file"
@@ -244,13 +255,6 @@ export default function ArticleForm({ action, initial, submitLabel }: ArticleFor
                 />
               </label>
             )}
-            <input
-              type="text"
-              value={coverImage}
-              onChange={(e) => setCoverImage(e.target.value)}
-              className={`${inputCls} text-xs`}
-              placeholder="Or paste image URL…"
-            />
             {imageError && <p className="text-xs text-crimson">{imageError}</p>}
           </div>
 
@@ -299,22 +303,34 @@ export default function ArticleForm({ action, initial, submitLabel }: ArticleFor
           {/* PDF */}
           <div className={`${sidebarCardCls} space-y-2`}>
             <label className={labelCls}>Source Document</label>
-            {pdfUrl ? (
+
+            {/* URL input — primary method */}
+            <input
+              type="text"
+              value={pdfUrl}
+              onChange={(e) => setPdfUrl(e.target.value)}
+              className={`${inputCls} text-xs`}
+              placeholder="Paste PDF URL here…"
+            />
+
+            {/* Attached indicator */}
+            {pdfUrl && (
               <div className="flex items-center gap-2 text-xs text-steel bg-slate-50 border border-border px-3 py-2">
                 <svg className="w-4 h-4 shrink-0 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="hover:text-crimson underline truncate flex-1">
-                  PDF attached
+                  PDF attached ↗
                 </a>
-                <button type="button" onClick={() => setPdfUrl("")} className="text-muted hover:text-crimson shrink-0 font-bold">
-                  ✕
-                </button>
+                <button type="button" onClick={() => setPdfUrl("")} className="text-muted hover:text-crimson shrink-0 font-bold">✕</button>
               </div>
-            ) : (
+            )}
+
+            {/* File upload — secondary */}
+            {!pdfUrl && (
               <label className="block cursor-pointer border border-dashed border-border hover:border-steel/40 transition-colors p-3 text-center">
-                <span className="text-xs text-muted">
-                  {pdfUploading ? "Uploading…" : "Upload PDF"}
+                <span className="text-[0.6rem] text-muted/60">
+                  {pdfUploading ? "Uploading…" : "or click to upload PDF file"}
                 </span>
                 <input
                   type="file"
@@ -328,13 +344,6 @@ export default function ArticleForm({ action, initial, submitLabel }: ArticleFor
                 />
               </label>
             )}
-            <input
-              type="text"
-              value={pdfUrl}
-              onChange={(e) => setPdfUrl(e.target.value)}
-              className={`${inputCls} text-xs`}
-              placeholder="Or paste PDF URL…"
-            />
             {pdfError && <p className="text-xs text-crimson">{pdfError}</p>}
           </div>
 
