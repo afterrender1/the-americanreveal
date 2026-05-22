@@ -23,6 +23,12 @@ export const metadata: Metadata = {
   },
   description:
     "Investigative journalism covering the Epstein network, American politics, and the stories the powerful want buried.",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.svg",
+  },
   openGraph: {
     siteName: "The American Reveal",
     type: "website",
