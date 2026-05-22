@@ -3,9 +3,11 @@ import Link from "next/link";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 import ArticleCard from "@/app/components/ArticleCard";
+import CommentsSection from "./CommentsSection";
 import { getArticleBySlug, getPublishedArticles, slugifyCategory } from "@/lib/articles";
 import { formatDate, getReadingTime, getContentHtml } from "@/lib/utils";
 import { getCategoryColor } from "@/lib/constants";
+import { getComments } from "@/lib/comments";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +31,10 @@ export default async function ArticlePage({ params }: PageProps) {
   const article = await getArticleBySlug(slug);
   if (!article) notFound();
 
-  const allArticles = await getPublishedArticles();
+  const [allArticles, comments] = await Promise.all([
+    getPublishedArticles(),
+    getComments(slug),
+  ]);
   const related = allArticles
     .filter((a) => a.id !== article.id && slugifyCategory(a.category) === slugifyCategory(article.category))
     .slice(0, 3);
@@ -43,20 +48,21 @@ export default async function ArticlePage({ params }: PageProps) {
       <Navbar />
 
       <main className="flex-1">
-        {/* Cover image */}
+        {/* Cover image — taller with stronger gradient */}
         {article.coverImage && (
-          <div className="relative h-72 md:h-[420px] overflow-hidden">
+          <div className="relative min-h-[480px] md:h-[560px] overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={article.coverImage}
               alt={article.title}
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
-            <div className="absolute bottom-6 left-6">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/45 to-black/10" />
+            {/* Category PILL badge bottom-left */}
+            <div className="absolute bottom-8 left-6 md:left-8">
               <Link
                 href={`/category/${slugifyCategory(article.category)}`}
-                className="inline-block text-[0.575rem] font-bold uppercase tracking-[0.2em] text-white px-3 py-1.5"
+                className="inline-block text-[0.5rem] font-bold uppercase tracking-[0.18em] text-white px-3 py-1.5 rounded-sm hover:opacity-85 transition-opacity"
                 style={{ backgroundColor: accent }}
               >
                 {article.category}
@@ -65,13 +71,13 @@ export default async function ArticlePage({ params }: PageProps) {
           </div>
         )}
 
-        <div className="max-w-7xl mx-auto px-6 py-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-14">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_296px] gap-16">
 
             {/* Article */}
             <article>
               {/* Breadcrumb */}
-              <nav className="flex items-center gap-2 text-[0.6rem] text-muted mb-6 uppercase tracking-widest">
+              <nav className="flex items-center gap-2 text-[0.6rem] text-muted mb-8 uppercase tracking-widest">
                 <Link href="/" className="hover:text-ink transition-colors">Home</Link>
                 <span>/</span>
                 <Link href={`/category/${slugifyCategory(article.category)}`} className="hover:text-ink transition-colors">
@@ -79,12 +85,12 @@ export default async function ArticlePage({ params }: PageProps) {
                 </Link>
               </nav>
 
-              {/* Category (when no cover image) */}
+              {/* Category pill (when no cover image) */}
               {!article.coverImage && (
                 <Link
                   href={`/category/${slugifyCategory(article.category)}`}
-                  className="inline-block text-[0.575rem] font-bold uppercase tracking-[0.2em] mb-5 hover:opacity-70 transition-opacity"
-                  style={{ color: accent }}
+                  className="inline-block text-[0.5rem] font-bold uppercase tracking-[0.18em] mb-6 px-3 py-1.5 rounded-sm text-white hover:opacity-80 transition-opacity"
+                  style={{ backgroundColor: accent }}
                 >
                   {article.category}
                 </Link>
@@ -92,15 +98,15 @@ export default async function ArticlePage({ params }: PageProps) {
 
               {/* Title */}
               <h1
-                className="text-3xl md:text-[2.75rem] font-bold leading-[1.1] text-ink mb-5"
+                className="text-3xl md:text-[2.75rem] font-bold leading-[1.1] text-ink mb-6"
                 style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
               >
                 {article.title}
               </h1>
 
-              {/* Deck / excerpt */}
+              {/* Deck / excerpt — styled pull quote with left border */}
               <p
-                className="text-steel text-lg md:text-xl leading-relaxed mb-7 border-l-[3px] pl-5"
+                className="text-steel text-lg md:text-xl leading-relaxed mb-8 pl-5 border-l-[3px]"
                 style={{ borderLeftColor: accent, fontFamily: "Georgia, serif" }}
               >
                 {article.excerpt}
@@ -113,14 +119,20 @@ export default async function ArticlePage({ params }: PageProps) {
                   <span>·</span>
                   <time>{formatDate(article.publishedAt)}</time>
                   <span>·</span>
-                  <span>{readingTime} min read</span>
+                  {/* Pill-style reading time badge */}
+                  <span
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-[0.5rem] font-bold uppercase tracking-[0.12em] border"
+                    style={{ color: accent, borderColor: `${accent}30`, backgroundColor: `${accent}0f` }}
+                  >
+                    {readingTime} min read
+                  </span>
                 </div>
                 {article.pdfUrl && (
                   <a
                     href={article.pdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-[0.575rem] font-bold uppercase tracking-[0.16em] text-white px-4 py-2 hover:opacity-90 transition-opacity"
+                    className="flex items-center gap-2 text-[0.575rem] font-bold uppercase tracking-[0.16em] text-white px-4 py-2 rounded-sm hover:opacity-90 transition-opacity"
                     style={{ backgroundColor: accent }}
                   >
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,7 +150,7 @@ export default async function ArticlePage({ params }: PageProps) {
               />
 
               {/* Footer tag */}
-              <div className="mt-12 pt-6 border-t border-border flex items-center justify-between flex-wrap gap-4">
+              <div className="mt-14 pt-6 border-t border-border flex items-center justify-between flex-wrap gap-4">
                 <p className="text-[0.6rem] text-muted uppercase tracking-widest">
                   Filed under{" "}
                   <Link
@@ -163,13 +175,21 @@ export default async function ArticlePage({ params }: PageProps) {
                   </a>
                 )}
               </div>
+
+              {/* Comments */}
+              <CommentsSection
+                slug={slug}
+                initialComments={comments}
+                accentColor={accent}
+              />
             </article>
 
             {/* Sidebar */}
             <aside className="space-y-10">
               {related.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-3 mb-5 pb-3 border-b-2 border-ink">
+                  {/* "Related Stories" with crimson left border header */}
+                  <div className="flex items-center gap-3 mb-5 pl-3 border-l-[3px] border-crimson">
                     <h3 className="text-[0.6rem] font-bold uppercase tracking-[0.22em] text-ink">
                       Related Stories
                     </h3>
@@ -180,13 +200,19 @@ export default async function ArticlePage({ params }: PageProps) {
                 </div>
               )}
 
-              <div className="bg-ink p-6">
-                <p
-                  className="text-[0.6rem] font-bold uppercase tracking-[0.22em] text-white/40 mb-3"
-                >
+              {/* About card with dot-grid texture on ink background */}
+              <div
+                className="bg-[#090909] p-6 relative overflow-hidden"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)",
+                  backgroundSize: "18px 18px",
+                }}
+              >
+                <p className="text-[0.6rem] font-bold uppercase tracking-[0.22em] text-white/40 mb-3 relative z-10">
                   About
                 </p>
-                <p className="text-[0.8125rem] text-white/60 leading-relaxed">
+                <p className="text-[0.8125rem] text-white/60 leading-relaxed relative z-10">
                   The American Reveal is an independent investigative publication
                   covering the Epstein network, American political power, and the
                   stories that demand accountability.

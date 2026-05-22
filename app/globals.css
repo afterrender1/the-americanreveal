@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cream: #EBE6D9;
-  --color-ink: #0A0A0A;
-  --color-crimson: #B91C1C;
-  --color-crimson-dark: #991B1B;
-  --color-steel: #4B4540;
-  --color-border: #D5CFC3;
-  --color-card: #FFFFFF;
-  --color-header: #0A0A0A;
+  --color-cream: #EDEAE2;
+  --color-ink: #0D0C0B;
+  --color-crimson: #C41E1E;
+  --color-crimson-dark: #A01717;
+  --color-steel: #4A4440;
+  --color-border: #D8D2C8;
+  --color-card: #FDFAF7;
+  --color-header: #070707;
   --color-muted: #7A746D;
 
   --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
@@ -16,11 +16,20 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+
+/* Article card hover shadow */
+.article-card {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.article-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+}
 html { scroll-behavior: smooth; }
 
 body {
-  background-color: #EBE6D9;
-  color: #0A0A0A;
+  background-color: #EDEAE2;
+  color: #0D0C0B;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

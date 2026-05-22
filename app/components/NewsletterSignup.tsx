@@ -6,14 +6,15 @@ import { subscribeAction } from "@/app/newsletter-action";
 export default function NewsletterSignup({ variant = "full" }: { variant?: "full" | "mini" }) {
   const [state, dispatch, pending] = useActionState(subscribeAction, null);
 
+  /* ── Mini (footer) ───────────────────────────────────────── */
   if (variant === "mini") {
     return (
       <div>
-        <p className="text-[0.6rem] font-bold uppercase tracking-[0.22em] text-white/30 mb-4">
+        <p className="text-[0.6rem] font-bold uppercase tracking-[0.22em] text-white/35 mb-4">
           Newsletter
         </p>
         {state?.ok ? (
-          <p className="text-[0.8125rem] text-crimson font-semibold">
+          <p className="text-[0.8125rem] font-semibold" style={{ color: "#f87171" }}>
             ✓ {state.message}
           </p>
         ) : (
@@ -27,12 +28,13 @@ export default function NewsletterSignup({ variant = "full" }: { variant?: "full
                 name="email"
                 required
                 placeholder="Your email address"
-                className="flex-1 bg-white/8 border border-white/15 text-white text-[0.8125rem] px-3 py-2 placeholder:text-white/30 focus:outline-none focus:border-crimson/60 transition-colors min-w-0"
+                className="flex-1 bg-white/8 border border-white/15 text-white text-[0.8125rem] px-3 py-2 placeholder:text-white/30 focus:outline-none focus:border-crimson/60 transition-colors min-w-0 rounded-l-lg"
               />
               <button
                 type="submit"
                 disabled={pending}
-                className="bg-crimson text-white text-[0.6rem] font-bold uppercase tracking-widest px-3 py-2 hover:bg-crimson-dark transition-colors disabled:opacity-50 whitespace-nowrap shrink-0"
+                className="text-white text-[0.6rem] font-bold uppercase tracking-widest px-4 py-2 hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap shrink-0 rounded-r-lg"
+                style={{ background: "linear-gradient(135deg, #C41E1E 0%, #9B1515 100%)" }}
               >
                 {pending ? "…" : "Subscribe"}
               </button>
@@ -43,64 +45,96 @@ export default function NewsletterSignup({ variant = "full" }: { variant?: "full
     );
   }
 
-  // Full variant (homepage)
+  /* ── Full (homepage) ─────────────────────────────────────── */
   return (
-    <div className="bg-ink">
-      <div className="max-w-7xl mx-auto px-6 py-14">
-        <div className="max-w-2xl mx-auto text-center">
-          {/* Label */}
-          <p className="text-[0.6rem] font-bold uppercase tracking-[0.25em] text-crimson mb-4">
-            The American Reveal Dispatch
-          </p>
+    <section
+      id="newsletter"
+      className="relative overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, #0D0B0A 0%, #1A0808 50%, #0D0B0A 100%)",
+      }}
+    >
+      {/* Crimson glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 50% at 50% 100%, rgba(196,30,30,0.18) 0%, transparent 70%)",
+        }}
+      />
+      {/* Dot grid */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.03]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.8) 1px, transparent 0)",
+          backgroundSize: "28px 28px",
+        }}
+      />
 
-          {/* Headline */}
+      <div className="relative max-w-7xl mx-auto px-6 py-20">
+        <div className="max-w-xl mx-auto text-center">
+
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-6 text-[0.575rem] font-bold uppercase tracking-[0.22em] border"
+            style={{ color: "#f87171", borderColor: "rgba(196,30,30,0.35)", backgroundColor: "rgba(196,30,30,0.08)" }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-crimson animate-pulse" />
+            The American Reveal Dispatch
+          </div>
+
           <h2
-            className="text-2xl md:text-3xl font-bold text-white mb-3"
+            className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight"
             style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
           >
-            Stay Informed. Stay Independent.
+            Stay Informed.
+            <br />
+            <span style={{ color: "rgba(255,255,255,0.45)" }}>Stay Independent.</span>
           </h2>
 
-          <p className="text-[0.875rem] text-white/45 mb-8 leading-relaxed">
-            Investigative updates on the Epstein network, American political power,
-            and the stories that demand accountability — delivered directly to your inbox.
-            No spam. Unsubscribe anytime.
+          <p className="text-sm leading-relaxed mb-8" style={{ color: "rgba(255,255,255,0.45)" }}>
+            Investigations delivered to your inbox — the Epstein network, political power, and
+            the stories that demand accountability. No noise. Unsubscribe anytime.
           </p>
 
           {state?.ok ? (
-            <div className="border border-crimson/30 bg-crimson/5 px-6 py-5">
-              <p className="text-crimson font-semibold text-sm">✓ {state.message}</p>
-              <p className="text-white/40 text-xs mt-1">Thank you for subscribing to The American Reveal.</p>
+            <div className="rounded-2xl border px-6 py-5"
+              style={{ borderColor: "rgba(196,30,30,0.3)", backgroundColor: "rgba(196,30,30,0.07)" }}>
+              <p className="font-semibold text-sm" style={{ color: "#f87171" }}>✓ {state.message}</p>
+              <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
+                You'll receive notifications for all future published articles.
+              </p>
             </div>
           ) : (
-            <form action={dispatch} className="flex flex-col sm:flex-row gap-0 max-w-md mx-auto">
-              <div className="flex-1">
-                {state?.message && (
-                  <p className="text-red-400 text-xs mb-2 text-left">{state.message}</p>
-                )}
+            <>
+              <form action={dispatch} className="flex gap-0 max-w-sm mx-auto shadow-xl rounded-xl overflow-hidden">
                 <input
                   type="email"
                   name="email"
                   required
                   placeholder="Enter your email address"
-                  className="w-full bg-white/[0.07] border border-white/15 text-white text-sm px-5 py-3.5 placeholder:text-white/30 focus:outline-none focus:border-crimson/50 transition-colors"
+                  className="flex-1 text-white text-sm px-5 py-3.5 placeholder:text-white/30 focus:outline-none transition-colors min-w-0"
+                  style={{ backgroundColor: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRight: "none" }}
                 />
-              </div>
-              <button
-                type="submit"
-                disabled={pending}
-                className="bg-crimson text-white text-[0.625rem] font-bold uppercase tracking-[0.18em] px-7 py-3.5 hover:bg-crimson-dark transition-colors disabled:opacity-50 whitespace-nowrap"
-              >
-                {pending ? "Subscribing…" : "Subscribe"}
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={pending}
+                  className="text-white text-[0.6rem] font-bold uppercase tracking-[0.18em] px-6 py-3.5 hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap shrink-0"
+                  style={{ background: "linear-gradient(135deg, #C41E1E 0%, #9B1515 100%)" }}
+                >
+                  {pending ? "…" : "Subscribe"}
+                </button>
+              </form>
+              {state?.message && (
+                <p className="text-red-400 text-xs mt-3">{state.message}</p>
+              )}
+            </>
           )}
 
-          <p className="text-[0.6rem] text-white/20 mt-5 uppercase tracking-widest">
-            We respect your privacy. Read our editorial commitment above.
+          <p className="text-[0.55rem] uppercase tracking-widest mt-5" style={{ color: "rgba(255,255,255,0.2)" }}>
+            We respect your privacy. No spam, ever.
           </p>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

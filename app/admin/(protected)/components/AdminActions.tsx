@@ -27,30 +27,35 @@ export function AdminActions({ id, published }: AdminActionsProps) {
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2 justify-end">
+      {/* Edit — small outlined button */}
       <Link
         href={`/admin/edit/${id}`}
-        className="text-xs font-semibold uppercase tracking-wide text-steel hover:text-ink transition-colors"
+        className="inline-flex items-center text-[0.6rem] font-semibold uppercase tracking-wide px-3 py-1 border border-border text-steel hover:border-steel transition-all"
       >
         Edit
       </Link>
+
+      {/* Publish / Unpublish — small colored pill button */}
       <button
         onClick={handleToggle}
         disabled={publishPending}
-        className={`text-xs font-semibold uppercase tracking-wide transition-colors disabled:opacity-50 ${
+        className={`inline-flex items-center text-[0.6rem] font-semibold uppercase tracking-wide px-3 py-1 border transition-all disabled:opacity-50 ${
           published
-            ? "text-crimson hover:text-crimson-dark"
-            : "text-green-700 hover:text-green-900"
+            ? "bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100"
+            : "bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
         }`}
       >
-        {publishPending ? "..." : published ? "Unpublish" : "Publish"}
+        {publishPending ? "…" : published ? "Unpublish" : "Publish"}
       </button>
+
+      {/* Delete — subtle outlined, crimson on hover */}
       <button
         onClick={handleDelete}
         disabled={deletePending}
-        className="text-xs font-semibold uppercase tracking-wide text-muted hover:text-crimson transition-colors disabled:opacity-50"
+        className="inline-flex items-center text-[0.6rem] font-semibold uppercase tracking-wide px-3 py-1 border border-transparent text-muted hover:border-crimson/30 hover:text-crimson transition-all disabled:opacity-50"
       >
-        {deletePending ? "..." : "Delete"}
+        {deletePending ? "…" : "Delete"}
       </button>
     </div>
   );

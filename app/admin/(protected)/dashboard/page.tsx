@@ -11,6 +11,37 @@ export default async function AdminDashboardPage() {
   const scheduledCount = articles.filter((a) => isScheduled(a)).length;
   const drafts = articles.filter((a) => !a.published).length;
 
+  const stats = [
+    {
+      label: "Live",
+      value: liveCount,
+      borderColor: "#16a34a",
+      textColor: "#15803d",
+      bg: "#f0fdf4",
+    },
+    {
+      label: "Scheduled",
+      value: scheduledCount,
+      borderColor: "#d97706",
+      textColor: "#b45309",
+      bg: "#fffbeb",
+    },
+    {
+      label: "Drafts",
+      value: drafts,
+      borderColor: "#9ca3af",
+      textColor: "#6b7280",
+      bg: "#f9fafb",
+    },
+    {
+      label: "Total Articles",
+      value: articles.length,
+      borderColor: "#0A0A0A",
+      textColor: "#0A0A0A",
+      bg: "#ffffff",
+    },
+  ];
+
   return (
     <div>
       {/* Page header */}
@@ -28,23 +59,35 @@ export default async function AdminDashboardPage() {
         </div>
         <Link
           href="/admin/new"
-          className="bg-ink text-white text-xs font-bold uppercase tracking-widest px-5 py-2.5 hover:bg-steel transition-colors"
+          className="bg-ink text-white text-[0.6rem] font-bold uppercase tracking-[0.18em] px-5 py-2.5 hover:opacity-85 transition-opacity"
         >
           + New Article
         </Link>
       </div>
 
-      {/* Stats */}
+      {/* Stats — 4 clean cards with accent left border */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {[
-          { label: "Total Articles", value: articles.length },
-          { label: "Live", value: liveCount },
-          { label: "Scheduled", value: scheduledCount },
-          { label: "Drafts", value: drafts },
-        ].map(({ label, value }) => (
-          <div key={label} className="bg-white border border-border p-4">
-            <p className="text-2xl font-bold text-ink">{value}</p>
-            <p className="text-xs text-muted uppercase tracking-widest mt-1">{label}</p>
+        {stats.map(({ label, value, borderColor, textColor, bg }) => (
+          <div
+            key={label}
+            className="p-5 border border-border/70"
+            style={{
+              backgroundColor: bg,
+              borderLeft: `3px solid ${borderColor}`,
+            }}
+          >
+            <p
+              className="text-3xl font-bold leading-none mb-1.5"
+              style={{ color: textColor }}
+            >
+              {value}
+            </p>
+            <p
+              className="text-[0.6rem] uppercase tracking-[0.18em] font-semibold"
+              style={{ color: textColor, opacity: 0.65 }}
+            >
+              {label}
+            </p>
           </div>
         ))}
       </div>
@@ -55,7 +98,7 @@ export default async function AdminDashboardPage() {
           <p className="text-steel mb-4">No articles yet.</p>
           <Link
             href="/admin/new"
-            className="text-xs font-bold uppercase tracking-widest text-crimson hover:text-crimson-dark"
+            className="text-[0.6rem] font-bold uppercase tracking-widest text-crimson hover:opacity-75 transition-opacity"
           >
             Create your first article →
           </Link>
@@ -65,26 +108,29 @@ export default async function AdminDashboardPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-left text-xs font-semibold uppercase tracking-widest text-muted px-5 py-3">
-                  Title
+                <th className="text-left px-5 py-3.5">
+                  <span className="text-[0.6rem] uppercase tracking-[0.18em] text-muted font-semibold">Title</span>
                 </th>
-                <th className="text-left text-xs font-semibold uppercase tracking-widest text-muted px-3 py-3 hidden md:table-cell">
-                  Category
+                <th className="text-left px-3 py-3.5 hidden md:table-cell">
+                  <span className="text-[0.6rem] uppercase tracking-[0.18em] text-muted font-semibold">Category</span>
                 </th>
-                <th className="text-left text-xs font-semibold uppercase tracking-widest text-muted px-3 py-3 hidden lg:table-cell">
-                  Date
+                <th className="text-left px-3 py-3.5 hidden lg:table-cell">
+                  <span className="text-[0.6rem] uppercase tracking-[0.18em] text-muted font-semibold">Date</span>
                 </th>
-                <th className="text-left text-xs font-semibold uppercase tracking-widest text-muted px-3 py-3">
-                  Status
+                <th className="text-left px-3 py-3.5">
+                  <span className="text-[0.6rem] uppercase tracking-[0.18em] text-muted font-semibold">Status</span>
                 </th>
-                <th className="text-right text-xs font-semibold uppercase tracking-widest text-muted px-5 py-3">
-                  Actions
+                <th className="text-right px-5 py-3.5">
+                  <span className="text-[0.6rem] uppercase tracking-[0.18em] text-muted font-semibold">Actions</span>
                 </th>
               </tr>
             </thead>
             <tbody>
               {articles.map((article) => (
-                <tr key={article.id} className="border-b border-border/50 last:border-0 hover:bg-[#F8F5EF] transition-colors">
+                <tr
+                  key={article.id}
+                  className="border-b border-border/40 last:border-0 transition-colors hover:bg-[#FDFAF6]"
+                >
                   <td className="px-5 py-4">
                     <div className="flex items-start gap-3">
                       {article.coverImage && (
@@ -106,12 +152,12 @@ export default async function AdminDashboardPage() {
                         </Link>
                         <div className="flex gap-1.5 mt-1 flex-wrap">
                           {article.featured && (
-                            <span className="text-xs bg-crimson/10 text-crimson px-1.5 py-0.5 font-semibold uppercase tracking-wide">
+                            <span className="text-[0.55rem] bg-crimson/10 text-crimson px-1.5 py-0.5 font-bold uppercase tracking-wide border border-crimson/20">
                               Featured
                             </span>
                           )}
                           {article.pdfUrl && (
-                            <span className="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 font-semibold uppercase tracking-wide">
+                            <span className="text-[0.55rem] bg-slate-100 text-slate-600 px-1.5 py-0.5 font-bold uppercase tracking-wide border border-slate-200">
                               PDF
                             </span>
                           )}
@@ -129,7 +175,7 @@ export default async function AdminDashboardPage() {
                   <td className="px-3 py-4 hidden md:table-cell">
                     <Link
                       href={`/category/${slugifyCategory(article.category)}`}
-                      className="text-xs font-semibold uppercase tracking-widest text-steel hover:text-crimson transition-colors"
+                      className="text-[0.6rem] font-semibold uppercase tracking-widest text-steel hover:text-crimson transition-colors"
                     >
                       {article.category}
                     </Link>
@@ -140,22 +186,23 @@ export default async function AdminDashboardPage() {
                   <td className="px-3 py-4">
                     {isScheduled(article) ? (
                       <div>
-                        <span className="text-xs font-semibold uppercase tracking-wide text-amber-600">
+                        {/* Scheduled pill */}
+                        <span className="inline-flex items-center text-[0.55rem] font-bold uppercase tracking-wide px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200">
                           Scheduled
                         </span>
                         {article.scheduledAt && (
-                          <p className="text-xs text-muted mt-0.5">
+                          <p className="text-[0.6rem] text-muted mt-0.5">
                             {formatDate(article.scheduledAt)}
                           </p>
                         )}
                       </div>
+                    ) : article.published ? (
+                      <span className="inline-flex items-center text-[0.55rem] font-bold uppercase tracking-wide px-2 py-0.5 bg-green-50 text-green-700 border border-green-200">
+                        Live
+                      </span>
                     ) : (
-                      <span
-                        className={`text-xs font-semibold uppercase tracking-wide ${
-                          article.published ? "text-green-700" : "text-muted"
-                        }`}
-                      >
-                        {article.published ? "Live" : "Draft"}
+                      <span className="inline-flex items-center text-[0.55rem] font-bold uppercase tracking-wide px-2 py-0.5 bg-gray-100 text-gray-500 border border-gray-200">
+                        Draft
                       </span>
                     )}
                   </td>

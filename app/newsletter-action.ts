@@ -1,6 +1,7 @@
 'use server'
 
 import { subscribe } from '@/lib/subscribers'
+import { sendNewSubscriberAlert } from '@/lib/mailer'
 
 export async function subscribeAction(
   _prev: { ok: boolean; message: string } | null,
@@ -12,5 +13,11 @@ export async function subscribeAction(
     return { ok: false, message: 'Please enter a valid email address.' }
   }
 
-  return subscribe(email)
+  const result = await subscribe(email)
+
+  if (result.ok) {
+    sendNewSubscriberAlert(email).catch(() => {})
+  }
+
+  return result
 }

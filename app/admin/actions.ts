@@ -3,8 +3,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createArticle, updateArticle, deleteArticle } from "@/lib/articles";
+import { createArticle, updateArticle, deleteArticle, getArticleById } from "@/lib/articles";
 import { sendNewsletterForArticle } from "@/lib/mailer";
+import { deleteComment } from "@/lib/comments";
 import {
   validateCredentials,
   getValidSessionToken,
@@ -123,8 +124,13 @@ export async function updateArticleAction(
     return { error: "All fields except Author are required." };
   }
 
+  // Check if this is a draft being published for the first time
+  const existing = await getArticleById(id);
+  const wasUnpublished = !existing?.published;
+
+  let updated;
   try {
-    await updateArticle(id, {
+    updated = await updateArticle(id, {
       title,
       slug,
       excerpt,
@@ -142,6 +148,11 @@ export async function updateArticleAction(
     return { error: err instanceof Error ? err.message : "Failed to save article. Please try again." };
   }
 
+  // Send newsletter when a draft is published immediately (not scheduled)
+  if (updated && published && !scheduledAt && wasUnpublished) {
+    sendNewsletterForArticle(updated).catch(() => {});
+  }
+
   revalidatePath("/");
   revalidatePath(`/article/${slug}`);
   revalidatePath("/admin/dashboard");
@@ -155,9 +166,26 @@ export async function deleteArticleAction(id: string) {
   revalidatePath("/admin/dashboard");
 }
 
+export async function deleteCommentAction(id: string, articleSlug?: string) {
+  if (!(await isAuthenticated())) redirect("/admin");
+  await deleteComment(id);
+  revalidatePath("/admin/comments");
+  if (articleSlug) revalidatePath(`/article/${articleSlug}`);
+}
+
 export async function togglePublishAction(id: string, published: boolean) {
   if (!(await isAuthenticated())) redirect("/admin");
-  await updateArticle(id, { published });
+
+  const existing = await getArticleById(id);
+  const wasUnpublished = !existing?.published;
+
+  const updated = await updateArticle(id, { published });
+
+  // Send newsletter when going live (not scheduled)
+  if (updated && published && wasUnpublished && !updated.scheduledAt) {
+    sendNewsletterForArticle(updated).catch(() => {});
+  }
+
   revalidatePath("/");
   revalidatePath("/admin/dashboard");
 }
