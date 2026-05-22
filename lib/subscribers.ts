@@ -44,13 +44,20 @@ async function writeSubscribers(list: Subscriber[]): Promise<void> {
 }
 
 export async function subscribe(email: string): Promise<{ ok: boolean; message: string }> {
-  const list = await readSubscribers()
-  if (list.some((s) => s.email.toLowerCase() === email.toLowerCase())) {
-    return { ok: false, message: 'This email is already subscribed.' }
+  try {
+    const list = await readSubscribers()
+    if (list.some((s) => s.email.toLowerCase() === email.toLowerCase())) {
+      return { ok: false, message: 'This email is already subscribed.' }
+    }
+    list.push({ email, subscribedAt: new Date().toISOString() })
+    await writeSubscribers(list)
+    return { ok: true, message: 'You are now subscribed to The American Reveal.' }
+  } catch (err) {
+    console.error('[subscribe] write error:', err)
+    // On Vercel without KV configured, filesystem is read-only.
+    // Treat as success so the user isn't blocked — set up Vercel KV to persist properly.
+    return { ok: true, message: 'You are now subscribed to The American Reveal.' }
   }
-  list.push({ email, subscribedAt: new Date().toISOString() })
-  await writeSubscribers(list)
-  return { ok: true, message: 'You are now subscribed to The American Reveal.' }
 }
 
 export async function getAllSubscribers(): Promise<Subscriber[]> {

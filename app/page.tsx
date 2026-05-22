@@ -77,20 +77,20 @@ export default async function HomePage() {
 
               {/* Row 1: lead (spans 2 rows) + two secondary */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-px bg-border border border-border">
-                {/* Lead card — spans 2 rows */}
+                {/* Lead card */}
                 {recent[0] && (
-                  <div className="md:col-span-7 md:row-span-2 min-h-[300px] md:min-h-0">
+                  <div className="md:col-span-7 md:row-span-2 min-h-[260px] sm:min-h-[320px] md:min-h-0">
                     <ArticleCard article={recent[0]} variant="lead" />
                   </div>
                 )}
                 {/* Secondary cards */}
                 {recent[1] && (
-                  <div className="md:col-span-5 min-h-[220px]">
+                  <div className="md:col-span-5 min-h-[200px] sm:min-h-[220px]">
                     <ArticleCard article={recent[1]} variant="lead" />
                   </div>
                 )}
                 {recent[2] && (
-                  <div className="md:col-span-5 min-h-[220px]">
+                  <div className="md:col-span-5 min-h-[200px] sm:min-h-[220px]">
                     <ArticleCard article={recent[2]} variant="lead" />
                   </div>
                 )}
@@ -100,7 +100,7 @@ export default async function HomePage() {
               {recent.slice(3, 6).length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border border-x border-b border-border">
                   {recent.slice(3, 6).map((a) => (
-                    <div key={a.id} className="bg-cream px-5 pt-5 pb-1">
+                    <div key={a.id} className="bg-cream px-4 sm:px-5 pt-5 pb-1">
                       <ArticleCard article={a} />
                     </div>
                   ))}

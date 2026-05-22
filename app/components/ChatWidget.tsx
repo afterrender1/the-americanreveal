@@ -107,7 +107,7 @@ export default function ChatWidget() {
       {/* Floating button */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full text-white shadow-2xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95"
+        className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full text-white shadow-2xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95"
         style={{
           background: open
             ? "linear-gradient(135deg, #7F1010 0%, #C41E1E 100%)"
@@ -130,10 +130,10 @@ export default function ChatWidget() {
 
       {/* Chat panel */}
       <div
-        className={`fixed bottom-24 right-6 z-50 w-[340px] sm:w-[380px] flex flex-col rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 ${
+        className={`fixed bottom-20 right-3 sm:bottom-24 sm:right-6 z-50 w-[calc(100vw-24px)] sm:w-[340px] md:w-[380px] flex flex-col rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 ${
           open ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"
         }`}
-        style={{ maxHeight: "520px", border: "1px solid rgba(255,255,255,0.08)" }}
+        style={{ maxHeight: "75vh", border: "1px solid rgba(255,255,255,0.08)" }}
       >
         {/* Header */}
         <div

@@ -41,7 +41,7 @@ export default function NewsSlider({ articles }: Props) {
           return (
             <div
               key={a.id}
-              className="relative min-w-full min-h-[480px] md:min-h-[560px] flex items-end flex-shrink-0"
+              className="relative min-w-full min-h-[380px] sm:min-h-[480px] md:min-h-[560px] flex items-end flex-shrink-0"
             >
               {/* Background image */}
               {a.coverImage ? (
@@ -59,10 +59,10 @@ export default function NewsSlider({ articles }: Props) {
               )}
 
               {/* Content */}
-              <div className="relative z-10 w-full px-8 md:px-14 pb-16">
+              <div className="relative z-10 w-full px-5 sm:px-8 md:px-14 pb-10 sm:pb-16">
                 <div className="max-w-3xl">
                   {/* Category + LIVE badge */}
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-3 mb-3">
                     <Link
                       href={`/category/${slugifyCategory(a.category)}`}
                       className="inline-block text-[0.55rem] font-bold uppercase tracking-[0.2em] text-white px-3 py-1 rounded-full hover:opacity-85 transition-opacity"
@@ -91,19 +91,19 @@ export default function NewsSlider({ articles }: Props) {
                     </Link>
                   </h2>
 
-                  {/* Excerpt */}
-                  <p className="text-white/60 text-base leading-relaxed mb-6 max-w-2xl line-clamp-2">
+                  {/* Excerpt — hidden on small phones */}
+                  <p className="hidden sm:block text-white/60 text-sm sm:text-base leading-relaxed mb-5 max-w-2xl line-clamp-2">
                     {a.excerpt}
                   </p>
 
                   {/* Meta + CTA */}
-                  <div className="flex flex-wrap items-center gap-4">
-                    <span className="text-[0.575rem] text-white/35 uppercase tracking-widest">
+                  <div className="flex flex-wrap items-center gap-3 mt-3 sm:mt-0">
+                    <span className="hidden sm:block text-[0.575rem] text-white/35 uppercase tracking-widest">
                       {a.author} &nbsp;·&nbsp; {formatDate(a.publishedAt)}
                     </span>
                     <Link
                       href={`/article/${a.slug}`}
-                      className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white px-5 py-2.5 rounded-full hover:opacity-90 transition-all"
+                      className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-full hover:opacity-90 transition-all"
                       style={{
                         background: `linear-gradient(135deg, ${accent} 0%, ${accent}cc 100%)`,
                       }}

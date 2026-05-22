@@ -106,19 +106,19 @@ export default function NewsletterSignup({ variant = "full" }: { variant?: "full
             </div>
           ) : (
             <>
-              <form action={dispatch} className="flex gap-0 max-w-sm mx-auto shadow-xl rounded-xl overflow-hidden">
+              <form action={dispatch} className="flex flex-col sm:flex-row gap-2 sm:gap-0 max-w-sm mx-auto">
                 <input
                   type="email"
                   name="email"
                   required
                   placeholder="Enter your email address"
-                  className="flex-1 text-white text-sm px-5 py-3.5 placeholder:text-white/30 focus:outline-none transition-colors min-w-0"
-                  style={{ backgroundColor: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRight: "none" }}
+                  className="flex-1 text-white text-sm px-5 py-3.5 placeholder:text-white/30 focus:outline-none transition-colors min-w-0 rounded-xl sm:rounded-r-none sm:rounded-l-xl"
+                  style={{ backgroundColor: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}
                 />
                 <button
                   type="submit"
                   disabled={pending}
-                  className="text-white text-[0.6rem] font-bold uppercase tracking-[0.18em] px-6 py-3.5 hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap shrink-0"
+                  className="text-white text-[0.6rem] font-bold uppercase tracking-[0.18em] px-6 py-3.5 hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap shrink-0 rounded-xl sm:rounded-l-none sm:rounded-r-xl shadow-xl"
                   style={{ background: "linear-gradient(135deg, #C41E1E 0%, #9B1515 100%)" }}
                 >
                   {pending ? "…" : "Subscribe"}

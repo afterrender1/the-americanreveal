@@ -59,6 +59,12 @@ export default async function AdminProtectedLayout({
               >
                 Comments
               </Link>
+              <Link
+                href="/admin/subscribers"
+                className="text-[0.6rem] uppercase tracking-[0.18em] text-white/40 hover:text-white transition-colors"
+              >
+                Subscribers
+              </Link>
             </nav>
           </div>
 
