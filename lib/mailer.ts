@@ -1,8 +1,8 @@
 import type { Article } from './articles'
 import { getAllSubscribers } from './subscribers'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://americanreveal.com'
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? 'newsletter@americanreveal.com'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theamericanreveal.com'
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? 'newsletter@theamericanreveal.com'
 const FROM_NAME = 'The American Reveal'
 const ADMIN_EMAIL = 'theamericanreveal@gmail.com'
 
@@ -133,9 +133,13 @@ export async function sendNewSubscriberAlert(subscriberEmail: string): Promise<v
 
 export async function sendNewsletterForArticle(article: Article): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) return // skip silently if not configured
+  if (!apiKey) {
+    console.warn('[mailer] RESEND_API_KEY not set — skipping newsletter')
+    return
+  }
 
   const subscribers = await getAllSubscribers()
+  console.log(`[mailer] sending to ${subscribers.length} subscribers from ${FROM_EMAIL}`)
   if (subscribers.length === 0) return
 
   const { Resend } = await import('resend')
@@ -144,11 +148,10 @@ export async function sendNewsletterForArticle(article: Article): Promise<void> 
   const html = buildEmailHtml(article)
   const subject = `New Story: ${article.title}`
 
-  // Resend free tier supports batch sending; send in groups of 50
   const BATCH = 50
   for (let i = 0; i < subscribers.length; i += BATCH) {
     const chunk = subscribers.slice(i, i + BATCH)
-    await Promise.allSettled(
+    const results = await Promise.allSettled(
       chunk.map((sub) =>
         resend.emails.send({
           from: `${FROM_NAME} <${FROM_EMAIL}>`,
@@ -158,5 +161,12 @@ export async function sendNewsletterForArticle(article: Article): Promise<void> 
         })
       )
     )
+    results.forEach((r, idx) => {
+      if (r.status === 'rejected') {
+        console.error(`[mailer] failed for ${chunk[idx].email}:`, r.reason)
+      } else if (r.value.error) {
+        console.error(`[mailer] Resend error for ${chunk[idx].email}:`, r.value.error)
+      }
+    })
   }
 }

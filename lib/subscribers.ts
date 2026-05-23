@@ -36,8 +36,13 @@ async function readSubscribers(): Promise<Subscriber[]> {
     return (await kv.get<Subscriber[]>(KV_KEY)) ?? []
   }
   if (useSupabase()) {
-    const { kvGet } = await import('./supabase')
-    return (await kvGet<Subscriber[]>(KV_KEY)) ?? []
+    const { kvGet, kvSet } = await import('./supabase')
+    const data = await kvGet<Subscriber[]>(KV_KEY)
+    if (data) return data
+    // Auto-seed from bundled JSON on first run
+    const seed = await readFromJson()
+    if (seed.length > 0) await kvSet(KV_KEY, seed)
+    return seed
   }
   return readFromJson()
 }
