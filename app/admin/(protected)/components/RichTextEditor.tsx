@@ -362,13 +362,20 @@ export default function RichTextEditor({
     },
     editorProps: {
       handlePaste(view, event) {
-        // Handle pasted images
+        // Handle pasted image files from clipboard
         const items = Array.from(event.clipboardData?.items ?? []);
         const imgItem = items.find((i) => i.type.startsWith("image/"));
         if (imgItem) {
           event.preventDefault();
           const file = imgItem.getAsFile();
           if (file) uploadImage(file);
+          return true;
+        }
+        // Handle pasted image URLs — auto-insert as image
+        const text = event.clipboardData?.getData("text/plain")?.trim() ?? "";
+        if (/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg|avif)(\?.*)?$/i.test(text)) {
+          event.preventDefault();
+          editor?.chain().focus().setImage({ src: text }).run();
           return true;
         }
         return false;
