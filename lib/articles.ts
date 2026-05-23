@@ -27,6 +27,28 @@ function useKV(): boolean {
   return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
 }
 
+function useSupabase(): boolean {
+  return !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY)
+}
+
+// ── Supabase helpers ───────────────────────────────────────────────────
+async function readFromSupabase(): Promise<Article[]> {
+  const { kvGet } = await import('./supabase')
+  const data = await kvGet<Article[]>(KV_KEY)
+  if (data) return data
+  const seed = await readFromJson()
+  if (seed.length > 0) {
+    const { kvSet } = await import('./supabase')
+    await kvSet(KV_KEY, seed)
+  }
+  return seed
+}
+
+async function writeToSupabase(articles: Article[]): Promise<void> {
+  const { kvSet } = await import('./supabase')
+  await kvSet(KV_KEY, articles)
+}
+
 // ── Local JSON helpers ─────────────────────────────────────────────────
 async function readFromJson(): Promise<Article[]> {
   try {
@@ -38,8 +60,15 @@ async function readFromJson(): Promise<Article[]> {
 }
 
 async function writeToJson(articles: Article[]): Promise<void> {
-  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true })
-  await fs.writeFile(DATA_FILE, JSON.stringify(articles, null, 2))
+  try {
+    await fs.mkdir(path.dirname(DATA_FILE), { recursive: true })
+    await fs.writeFile(DATA_FILE, JSON.stringify(articles, null, 2))
+  } catch (err: unknown) {
+    if (err && typeof err === 'object' && 'code' in err && (err as NodeJS.ErrnoException).code === 'EROFS') {
+      throw new Error('Storage not configured. Please connect a KV database in your Vercel dashboard (Settings → Storage → Create KV Store), then redeploy.')
+    }
+    throw err
+  }
 }
 
 // ── KV helpers (only called in production) ─────────────────────────────
@@ -60,11 +89,15 @@ async function writeToKV(articles: Article[]): Promise<void> {
 
 // ── Unified read / write ───────────────────────────────────────────────
 async function readArticles(): Promise<Article[]> {
-  return useKV() ? readFromKV() : readFromJson()
+  if (useKV()) return readFromKV()
+  if (useSupabase()) return readFromSupabase()
+  return readFromJson()
 }
 
 async function writeArticles(articles: Article[]): Promise<void> {
-  return useKV() ? writeToKV(articles) : writeToJson(articles)
+  if (useKV()) return writeToKV(articles)
+  if (useSupabase()) return writeToSupabase(articles)
+  return writeToJson(articles)
 }
 
 // ── Public API ─────────────────────────────────────────────────────────

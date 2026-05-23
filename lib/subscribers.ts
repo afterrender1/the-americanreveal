@@ -13,6 +13,10 @@ function useKV(): boolean {
   return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
 }
 
+function useSupabase(): boolean {
+  return !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY)
+}
+
 async function readFromJson(): Promise<Subscriber[]> {
   try {
     return JSON.parse(await fs.readFile(DATA_FILE, 'utf-8'))
@@ -31,6 +35,10 @@ async function readSubscribers(): Promise<Subscriber[]> {
     const { kv } = await import('@vercel/kv')
     return (await kv.get<Subscriber[]>(KV_KEY)) ?? []
   }
+  if (useSupabase()) {
+    const { kvGet } = await import('./supabase')
+    return (await kvGet<Subscriber[]>(KV_KEY)) ?? []
+  }
   return readFromJson()
 }
 
@@ -38,6 +46,11 @@ async function writeSubscribers(list: Subscriber[]): Promise<void> {
   if (useKV()) {
     const { kv } = await import('@vercel/kv')
     await kv.set(KV_KEY, list)
+    return
+  }
+  if (useSupabase()) {
+    const { kvSet } = await import('./supabase')
+    await kvSet(KV_KEY, list)
     return
   }
   return writeToJson(list)
@@ -54,8 +67,6 @@ export async function subscribe(email: string): Promise<{ ok: boolean; message: 
     return { ok: true, message: 'You are now subscribed to The American Reveal.' }
   } catch (err) {
     console.error('[subscribe] write error:', err)
-    // On Vercel without KV configured, filesystem is read-only.
-    // Treat as success so the user isn't blocked — set up Vercel KV to persist properly.
     return { ok: true, message: 'You are now subscribed to The American Reveal.' }
   }
 }

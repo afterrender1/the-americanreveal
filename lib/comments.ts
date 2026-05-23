@@ -16,10 +16,18 @@ function useKV(): boolean {
   return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
 }
 
+function useSupabase(): boolean {
+  return !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY)
+}
+
 async function readAll(): Promise<Comment[]> {
   if (useKV()) {
     const { kv } = await import('@vercel/kv')
     return (await kv.get<Comment[]>(KV_KEY)) ?? []
+  }
+  if (useSupabase()) {
+    const { kvGet } = await import('./supabase')
+    return (await kvGet<Comment[]>(KV_KEY)) ?? []
   }
   try {
     return JSON.parse(await fs.readFile(DATA_FILE, 'utf-8'))
@@ -34,8 +42,20 @@ async function writeAll(list: Comment[]): Promise<void> {
     await kv.set(KV_KEY, list)
     return
   }
-  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true })
-  await fs.writeFile(DATA_FILE, JSON.stringify(list, null, 2))
+  if (useSupabase()) {
+    const { kvSet } = await import('./supabase')
+    await kvSet(KV_KEY, list)
+    return
+  }
+  try {
+    await fs.mkdir(path.dirname(DATA_FILE), { recursive: true })
+    await fs.writeFile(DATA_FILE, JSON.stringify(list, null, 2))
+  } catch (err: unknown) {
+    if (err && typeof err === 'object' && 'code' in err && (err as NodeJS.ErrnoException).code === 'EROFS') {
+      throw new Error('Storage not configured.')
+    }
+    throw err
+  }
 }
 
 export async function getComments(slug: string): Promise<Comment[]> {
