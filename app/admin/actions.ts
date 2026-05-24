@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { createArticle, updateArticle, deleteArticle, getArticleById } from "@/lib/articles";
 import { sendNewsletterForArticle } from "@/lib/mailer";
 import { deleteComment } from "@/lib/comments";
+import { removeSubscriber } from "@/lib/subscribers";
 import {
   validateCredentials,
   getValidSessionToken,
@@ -171,6 +172,12 @@ export async function deleteCommentAction(id: string, articleSlug?: string) {
   await deleteComment(id);
   revalidatePath("/admin/comments");
   if (articleSlug) revalidatePath(`/article/${articleSlug}`);
+}
+
+export async function removeSubscriberAction(email: string) {
+  if (!(await isAuthenticated())) redirect("/admin");
+  await removeSubscriber(email);
+  revalidatePath("/admin/subscribers");
 }
 
 export async function togglePublishAction(id: string, published: boolean) {

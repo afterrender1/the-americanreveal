@@ -1,4 +1,5 @@
 import { getAllSubscribers } from "@/lib/subscribers";
+import RemoveSubscriberButton from "./RemoveSubscriberButton";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,7 @@ export default async function AdminSubscribersPage() {
                 <th className="text-left px-5 py-3.5 hidden sm:table-cell">
                   <span className="text-[0.6rem] uppercase tracking-[0.18em] text-muted font-semibold">Subscribed</span>
                 </th>
+                <th className="px-5 py-3.5" />
               </tr>
             </thead>
             <tbody>
@@ -72,6 +74,9 @@ export default async function AdminSubscribersPage() {
                         year: "numeric",
                       })}
                     </span>
+                  </td>
+                  <td className="px-5 py-4 text-right">
+                    <RemoveSubscriberButton email={sub.email} />
                   </td>
                 </tr>
               ))}

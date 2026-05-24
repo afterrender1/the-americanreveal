@@ -79,3 +79,8 @@ export async function subscribe(email: string): Promise<{ ok: boolean; message: 
 export async function getAllSubscribers(): Promise<Subscriber[]> {
   return readSubscribers()
 }
+
+export async function removeSubscriber(email: string): Promise<void> {
+  const list = await readSubscribers()
+  await writeSubscribers(list.filter((s) => s.email.toLowerCase() !== email.toLowerCase()))
+}
