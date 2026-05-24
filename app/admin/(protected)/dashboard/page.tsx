@@ -2,11 +2,12 @@ import Link from "next/link";
 import { getAllArticles, isScheduled, slugifyCategory } from "@/lib/articles";
 import { formatDate } from "@/lib/utils";
 import { AdminActions } from "../components/AdminActions";
+import { getAllViews } from "@/lib/views";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  const articles = await getAllArticles();
+  const [articles, views] = await Promise.all([getAllArticles(), getAllViews()]);
   const liveCount = articles.filter((a) => a.published && !isScheduled(a)).length;
   const scheduledCount = articles.filter((a) => isScheduled(a)).length;
   const drafts = articles.filter((a) => !a.published).length;
@@ -120,6 +121,9 @@ export default async function AdminDashboardPage() {
                 <th className="text-left px-3 py-3.5">
                   <span className="text-[0.6rem] uppercase tracking-[0.18em] text-muted font-semibold">Status</span>
                 </th>
+                <th className="text-center px-3 py-3.5 hidden sm:table-cell">
+                  <span className="text-[0.6rem] uppercase tracking-[0.18em] text-muted font-semibold">Views</span>
+                </th>
                 <th className="text-right px-5 py-3.5">
                   <span className="text-[0.6rem] uppercase tracking-[0.18em] text-muted font-semibold">Actions</span>
                 </th>
@@ -205,6 +209,12 @@ export default async function AdminDashboardPage() {
                         Draft
                       </span>
                     )}
+                  </td>
+                  <td className="px-3 py-4 hidden sm:table-cell text-center">
+                    <span className="text-xs font-semibold text-steel tabular-nums">
+                      {(views[article.slug] ?? 0).toLocaleString()}
+                    </span>
+                    <p className="text-[0.55rem] text-muted uppercase tracking-wide">views</p>
                   </td>
                   <td className="px-5 py-4 text-right">
                     <AdminActions id={article.id} published={article.published} />
