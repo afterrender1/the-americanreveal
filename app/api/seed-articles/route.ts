@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createArticle } from '@/lib/articles'
+import { createArticle, getArticleBySlug } from '@/lib/articles'
+import { sendNewsletterForArticle } from '@/lib/mailer'
 import { slugify } from '@/lib/utils'
 
 export async function GET(req: NextRequest) {
@@ -95,25 +96,36 @@ export async function GET(req: NextRequest) {
     },
   ]
 
+  const notifyOnly = req.nextUrl.searchParams.get('notify') === 'true'
   const created: string[] = []
 
   for (const a of articles) {
     try {
-      await createArticle({
-        title: a.title,
-        slug: a.slug,
-        excerpt: a.excerpt,
-        category: a.category,
-        author: a.author,
-        content: a.content,
-        publishedAt: new Date().toISOString(),
-        published: true,
-        featured: false,
-        coverImage: a.coverImage,
-      })
-      created.push(a.title)
+      if (notifyOnly) {
+        // Just send newsletter for already-inserted articles
+        const existing = await getArticleBySlug(a.slug)
+        if (existing) {
+          await sendNewsletterForArticle(existing)
+          created.push(a.title)
+        }
+      } else {
+        const article = await createArticle({
+          title: a.title,
+          slug: a.slug,
+          excerpt: a.excerpt,
+          category: a.category,
+          author: a.author,
+          content: a.content,
+          publishedAt: new Date().toISOString(),
+          published: true,
+          featured: false,
+          coverImage: a.coverImage,
+        })
+        await sendNewsletterForArticle(article)
+        created.push(a.title)
+      }
     } catch (err) {
-      console.error('Failed to insert:', a.title, err)
+      console.error('Failed:', a.title, err)
     }
   }
 
