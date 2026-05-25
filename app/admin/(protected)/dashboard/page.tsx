@@ -11,6 +11,7 @@ export default async function AdminDashboardPage() {
   const liveCount = articles.filter((a) => a.published && !isScheduled(a)).length;
   const scheduledCount = articles.filter((a) => isScheduled(a)).length;
   const drafts = articles.filter((a) => !a.published).length;
+  const totalViews = Object.values(views).reduce((sum, n) => sum + n, 0);
 
   const stats = [
     {
@@ -40,6 +41,13 @@ export default async function AdminDashboardPage() {
       borderColor: "#0A0A0A",
       textColor: "#0A0A0A",
       bg: "#ffffff",
+    },
+    {
+      label: "Total Views",
+      value: totalViews.toLocaleString(),
+      borderColor: "#B91C1C",
+      textColor: "#B91C1C",
+      bg: "#fff1f2",
     },
   ];
 
