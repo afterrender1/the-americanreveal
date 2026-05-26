@@ -39,6 +39,13 @@ export default function Footer() {
               <p className="text-[0.6rem] font-semibold uppercase tracking-[0.18em] mt-5" style={{ color: "rgba(255,255,255,0.22)" }}>
                 First Amendment Protected
               </p>
+              <a
+                href="mailto:theamericanreveal@gmail.com"
+                className="inline-block text-[0.6rem] mt-3 transition-colors hover:text-white/70"
+                style={{ color: "rgba(255,255,255,0.38)" }}
+              >
+                theamericanreveal@gmail.com
+              </a>
               {/* Social */}
               <div className="mt-5 flex items-center gap-3">
                 <a
