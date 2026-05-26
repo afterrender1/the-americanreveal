@@ -8,7 +8,7 @@ import { getArticleBySlug, getPublishedArticles, slugifyCategory } from "@/lib/a
 import { formatDate, getReadingTime, getContentHtml } from "@/lib/utils";
 import { getCategoryColor } from "@/lib/constants";
 import { getComments } from "@/lib/comments";
-import { incrementView } from "@/lib/views";
+import ViewTracker from "./ViewTracker";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +35,6 @@ export default async function ArticlePage({ params }: PageProps) {
   const [allArticles, comments] = await Promise.all([
     getPublishedArticles(),
     getComments(slug),
-    incrementView(slug),
   ]);
   const related = allArticles
     .filter((a) => a.id !== article.id && slugifyCategory(a.category) === slugifyCategory(article.category))
@@ -50,6 +49,7 @@ export default async function ArticlePage({ params }: PageProps) {
       <Navbar />
 
       <main className="flex-1">
+        <ViewTracker slug={slug} />
         {/* Cover image — taller with stronger gradient */}
         {article.coverImage && (
           <div className="relative min-h-[480px] md:h-[560px] overflow-hidden">
