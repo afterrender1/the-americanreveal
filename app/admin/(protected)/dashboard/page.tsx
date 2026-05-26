@@ -114,13 +114,13 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Geo breakdown */}
-      {topCountries.length > 0 && (
-        <div className="mb-8 bg-white border border-border p-5">
-          <h2
-            className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-muted mb-4"
-          >
-            Views by Country
-          </h2>
+      <div className="mb-8 bg-white border border-border p-5">
+        <h2 className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-muted mb-4">
+          Views by Country
+        </h2>
+        {topCountries.length === 0 ? (
+          <p className="text-xs text-muted">No location data yet — will populate as readers visit articles.</p>
+        ) : (
           <div className="space-y-2">
             {topCountries.map(([code, count]) => {
               const pct = totalViews > 0 ? Math.round((count / totalViews) * 100) : 0;
@@ -145,8 +145,8 @@ export default async function AdminDashboardPage() {
               );
             })}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Articles table */}
       {articles.length === 0 ? (
