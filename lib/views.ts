@@ -1,4 +1,5 @@
 const KV_KEY = 'tar:views'
+const GEO_KEY = 'tar:geo'
 
 async function readViews(): Promise<Record<string, number>> {
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
@@ -24,7 +25,31 @@ async function writeViews(views: Record<string, number>): Promise<void> {
   }
 }
 
-export async function incrementView(slug: string): Promise<void> {
+async function readGeo(): Promise<Record<string, number>> {
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+    const { kvGet } = await import('./supabase')
+    return (await kvGet<Record<string, number>>(GEO_KEY)) ?? {}
+  }
+  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    const { kv } = await import('@vercel/kv')
+    return (await kv.get<Record<string, number>>(GEO_KEY)) ?? {}
+  }
+  return {}
+}
+
+async function writeGeo(geo: Record<string, number>): Promise<void> {
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+    const { kvSet } = await import('./supabase')
+    await kvSet(GEO_KEY, geo)
+    return
+  }
+  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    const { kv } = await import('@vercel/kv')
+    await kv.set(GEO_KEY, geo)
+  }
+}
+
+export async function incrementView(slug: string, country?: string): Promise<void> {
   try {
     const views = await readViews()
     views[slug] = (views[slug] ?? 0) + 1
@@ -32,11 +57,29 @@ export async function incrementView(slug: string): Promise<void> {
   } catch {
     // Never block article rendering over a view count failure
   }
+
+  if (country) {
+    try {
+      const geo = await readGeo()
+      geo[country] = (geo[country] ?? 0) + 1
+      await writeGeo(geo)
+    } catch {
+      // geo tracking is best-effort
+    }
+  }
 }
 
 export async function getAllViews(): Promise<Record<string, number>> {
   try {
     return await readViews()
+  } catch {
+    return {}
+  }
+}
+
+export async function getAllGeoViews(): Promise<Record<string, number>> {
+  try {
+    return await readGeo()
   } catch {
     return {}
   }

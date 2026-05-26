@@ -2,16 +2,28 @@ import Link from "next/link";
 import { getAllArticles, isScheduled, slugifyCategory } from "@/lib/articles";
 import { formatDate } from "@/lib/utils";
 import { AdminActions } from "../components/AdminActions";
-import { getAllViews } from "@/lib/views";
+import { getAllViews, getAllGeoViews } from "@/lib/views";
 
 export const dynamic = "force-dynamic";
 
+const COUNTRY_NAMES: Record<string, string> = {
+  US: "United States", GB: "United Kingdom", CA: "Canada", AU: "Australia",
+  DE: "Germany", FR: "France", IN: "India", PK: "Pakistan", AE: "UAE",
+  SA: "Saudi Arabia", MX: "Mexico", BR: "Brazil", NG: "Nigeria", ZA: "South Africa",
+  NL: "Netherlands", SE: "Sweden", NO: "Norway", PH: "Philippines", SG: "Singapore",
+  NZ: "New Zealand", IE: "Ireland", IT: "Italy", ES: "Spain", JP: "Japan",
+  KR: "South Korea", TR: "Turkey", PL: "Poland", EG: "Egypt", KE: "Kenya",
+};
+
 export default async function AdminDashboardPage() {
-  const [articles, views] = await Promise.all([getAllArticles(), getAllViews()]);
+  const [articles, views, geo] = await Promise.all([getAllArticles(), getAllViews(), getAllGeoViews()]);
   const liveCount = articles.filter((a) => a.published && !isScheduled(a)).length;
   const scheduledCount = articles.filter((a) => isScheduled(a)).length;
   const drafts = articles.filter((a) => !a.published).length;
   const totalViews = Object.values(views).reduce((sum, n) => sum + n, 0);
+  const topCountries = Object.entries(geo)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
 
   const stats = [
     {
@@ -100,6 +112,41 @@ export default async function AdminDashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* Geo breakdown */}
+      {topCountries.length > 0 && (
+        <div className="mb-8 bg-white border border-border p-5">
+          <h2
+            className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-muted mb-4"
+          >
+            Views by Country
+          </h2>
+          <div className="space-y-2">
+            {topCountries.map(([code, count]) => {
+              const pct = totalViews > 0 ? Math.round((count / totalViews) * 100) : 0;
+              return (
+                <div key={code} className="flex items-center gap-3">
+                  <span className="text-xs font-semibold text-ink w-36 shrink-0 truncate">
+                    {COUNTRY_NAMES[code] ?? code}
+                  </span>
+                  <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-crimson"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <span className="text-xs tabular-nums text-steel w-10 text-right shrink-0">
+                    {count.toLocaleString()}
+                  </span>
+                  <span className="text-[0.6rem] text-muted w-8 text-right shrink-0">
+                    {pct}%
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Articles table */}
       {articles.length === 0 ? (

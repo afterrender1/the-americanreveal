@@ -6,6 +6,10 @@ export async function POST(req: NextRequest) {
   if (!slug || typeof slug !== 'string') {
     return NextResponse.json({ error: 'Missing slug' }, { status: 400 })
   }
-  await incrementView(slug)
+
+  // Vercel automatically attaches geo headers on their platform
+  const country = req.headers.get('x-vercel-ip-country') ?? undefined
+
+  await incrementView(slug, country)
   return NextResponse.json({ ok: true })
 }
